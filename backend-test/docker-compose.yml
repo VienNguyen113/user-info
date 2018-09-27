@@ -1,0 +1,30 @@
+version: '3.3'
+services:
+  db:
+    image: mongo:latest
+    volumes:
+      - ./migrations/db/backend-dev:/backend-dev
+      - ./migrations/db:/docker-entrypoint-initdb.d
+    ports:
+      - '27017:27017'
+    container_name: test-backend-db-cont
+  node:
+    image: node:8
+    links:
+      - db:db
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+    working_dir: /SeniorSays
+    volumes:
+      - .:/SeniorSays
+    tty: true
+    user: '1000:1000'
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm install
+        npm run dev
+    container_name: test-backend-node-cont
