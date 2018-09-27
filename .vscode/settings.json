@@ -1,0 +1,12 @@
+{
+  "workbench.colorTheme": "Monokai",
+  "sublimeTextKeymap.promptV3Features": true,
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 100,
+  "workbench.panel.location": "bottom",
+  "workbench.iconTheme": "material-icon-theme",
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "prettier.eslintIntegration": true,
+  "eslint.run": "onSave"
+}

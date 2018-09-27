@@ -12,9 +12,9 @@ import {
 
 function* handleGetAll() {
   try {
-    const data = yield call(() => request().get('/users'));
+    const res = yield call(() => request().get('/users'));
 
-    yield put({ type: GET_ALL_SUCCEEDED, data });
+    yield put({ type: GET_ALL_SUCCEEDED, data: res.data });
   } catch (err) {
     yield put({ type: GET_ALL_FAILED, error: err.response.data });
   }
@@ -22,8 +22,8 @@ function* handleGetAll() {
 
 function* handleSubmit(action) {
   try {
-    const data = yield call(() => request().post('/users', action.user));
-    yield put({ type: SUBMIT_SUCCEEDED, data });
+    const res = yield call(() => request().post('/users', action.user));
+    yield put({ type: SUBMIT_SUCCEEDED, data: res.data });
   } catch (err) {
     yield put({ type: SUBMIT_FAILED, error: err.response.data });
   }

@@ -6,50 +6,113 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import validator from 'validator';
+import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
-
 import UserForm from 'components/UserForm/Loadable';
+import { INVALID_EMAIL_ADDRESS } from 'utils/constants';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
 import { makeSelectUser, makeSelectUsers } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-import { submit } from './actions';
+import { submit, getAll } from './actions';
 
-/* eslint-disable react/prefer-stateless-function */
 export class User extends React.Component {
   constructor(props) {
     super(props);
-    this.state = this.props.user.data || {};
+
     this.submitted = false;
+    this.isGotLastOldUserData = false;
+
+    this.state = {
+      data: {
+        firstName: '',
+        lastName: '',
+        company: '',
+        department: '',
+        position: '',
+        email: '',
+      },
+      formErrors: {
+        email: '',
+      },
+    };
   }
 
-  componentWillMount() {}
+  componentWillMount() {
+    this.props.dispatch(getAll());
+    this.getLastOldUserData(this.props.users.data);
+  }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.user.data || {});
+    if (!isEmpty(nextProps.users.data) && !this.isGotLastOldUserData) {
+      this.getLastOldUserData(nextProps.users.data);
+    }
   }
 
-  handleSubmit = () => {
-    this.submitted = true;
-    this.props.dispatch(submit(this.state));
+  getLastOldUserData(usersData) {
+    if (isEmpty(usersData)) return false;
+
+    this.isGotLastOldUserData = true;
+    return this.setState({
+      data: {
+        firstName: usersData[0].firstName,
+        lastName: usersData[0].lastName,
+        company: usersData[0].company,
+        department: usersData[0].department,
+        position: usersData[0].position,
+        email: usersData[0].email,
+      },
+    });
+  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const { isValid, formErrors } = this.validate();
+
+    if (!isValid) {
+      return this.setState({ formErrors });
+    }
+
+    this.setState({ formErrors });
+    this.isSubmitted = true;
+    return this.props.dispatch(submit(this.state.data));
+  };
+
+  validate = () => {
+    const formErrors = {};
+    const { email } = this.state.data;
+    if (validator.isEmpty(email) || !validator.isEmail(email)) {
+      formErrors.email = INVALID_EMAIL_ADDRESS;
+    }
+    return {
+      isValid: isEmpty(formErrors),
+      formErrors,
+    };
   };
 
   handleChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
+    this.setState({
+      ...this.state,
+      data: { ...this.state.data, [e.target.name]: e.target.value },
+    });
   };
 
   render() {
-    const data = this.state;
+    const newUserData = this.props.user;
     return (
-      <div className="container">
+      <div className="container userForm">
         <UserForm
-          data={data}
+          data={this.state.data}
+          formErrors={this.state.formErrors}
           onChange={this.handleChange}
           onSubmit={this.handleSubmit}
+          isLoading={newUserData.loading}
+          isCreatedUser={newUserData.success}
         />
       </div>
     );
@@ -58,6 +121,7 @@ export class User extends React.Component {
 
 User.propTypes = {
   dispatch: PropTypes.func.isRequired,
+  users: PropTypes.object.isRequired,
   user: PropTypes.object.isRequired,
 };
 

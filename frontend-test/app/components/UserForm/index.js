@@ -7,90 +7,130 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import {
+  Form,
+  FormGroup,
+  Input,
+  Label,
+  FormFeedback,
+  Container,
+  Row,
+  Col,
+  Button,
+} from 'reactstrap';
 
-const button = styled.button`
-  box-shadow: none;
-  background-color: #4285f4;
-  background-image: none;
-  cursor: pointer;
-  border-color: transparent !important;
-  border-radius: 2px;
-  border-width: 1px;
-  border-style: inset;
-  color: #fff;
-  height: 30px;
-  text-transform: uppercase;
-  font-size: var(--docs-material-font-size-normal, 13px);
-  margin-right: 12px;
-  padding: 0 7px;
-  min-width: 0;
+const Wrapper = styled.div`
+  max-width: 770px;
+  width: 100%;
+  padding: 3rem;
+  margin: 0 auto;
+
+  .group_buttons {
+    button {
+      padding: 6px 24px;
+    }
+  }
 `;
 
 function UserForm(props) {
   return (
-    <div className="container">
-      <div className="group">
-        <div>
-          <span>First Name</span>
-          <input
-            type="text"
-            name="firstName"
-            value={props.data.firstName || ''}
-            onChange={props.onChange}
-          />
-        </div>
-        <div>
-          <span>Last Name</span>
-          <input
-            type="text"
-            name="lastName"
-            value={props.data.lastName || ''}
-            onChange={props.onChange}
-          />
-        </div>
-      </div>
-      <div className="group">
-        <div>
-          <span>Company</span>
-          <input
-            type="text"
-            name="company"
-            value={props.data.company || ''}
-            onChange={props.onChange}
-          />
-        </div>
-        <div>
-          <span>Department</span>
-          <input
-            type="text"
-            name="department"
-            value={props.data.department || ''}
-            onChange={props.onChange}
-          />
-        </div>
-        <div>
-          <span>Position</span>
-          <input
-            type="text"
-            name="position"
-            value={props.data.position || ''}
-            onChange={props.onChange}
-          />
-        </div>
-      </div>
-      <div className="group">
-        <div>
-          <span>Email</span>
-          <input
-            type="email"
-            name="email"
-            value={props.data.email || ''}
-            onChange={props.onChange}
-          />
-        </div>
-      </div>
-      <button onClick={props.onSubmit}>Submit</button>
-    </div>
+    <Wrapper>
+      <Container>
+        <Row>
+          <Col sm="12">
+            <Form onSubmit={props.onSubmit}>
+              <FormGroup row>
+                <Label sm={2}>First Name</Label>
+                <Col sm={10}>
+                  <Input
+                    name="firstName"
+                    id="firstName"
+                    placeholder="First Name"
+                    value={props.data.firstName}
+                    onChange={props.onChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label sm={2}>Last Name</Label>
+                <Col sm={10}>
+                  <Input
+                    name="lastName"
+                    id="lastName"
+                    placeholder="Last Name"
+                    value={props.data.lastName}
+                    onChange={props.onChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label sm={2}>Company</Label>
+                <Col sm={10}>
+                  <Input
+                    name="company"
+                    id="company"
+                    placeholder="Company"
+                    value={props.data.company}
+                    onChange={props.onChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label sm={2}>Department</Label>
+                <Col sm={10}>
+                  <Input
+                    name="department"
+                    id="department"
+                    placeholder="Department"
+                    value={props.data.department}
+                    onChange={props.onChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label sm={2}>Position</Label>
+                <Col sm={10}>
+                  <Input
+                    name="position"
+                    id="position"
+                    placeholder="Position"
+                    value={props.data.position}
+                    onChange={props.onChange}
+                  />
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Label sm={2}>Email</Label>
+                <Col sm={10}>
+                  <Input
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="Email"
+                    onChange={props.onChange}
+                    value={props.data.email}
+                    invalid={!!props.formErrors.email}
+                  />
+                  <FormFeedback>{props.formErrors.email}</FormFeedback>
+                </Col>
+              </FormGroup>
+
+              <FormGroup className="group_buttons text-center">
+                {props.isCreatedUser ? (
+                  <p className="text-success">
+                    You just created user successfully!
+                  </p>
+                ) : (
+                  <Button disabled={props.isLoading} color="primary">
+                    Save
+                  </Button>
+                )}
+              </FormGroup>
+            </Form>
+          </Col>
+        </Row>
+      </Container>
+    </Wrapper>
   );
 }
 
@@ -103,8 +143,13 @@ UserForm.propTypes = {
     position: PropTypes.string,
     email: PropTypes.string,
   }),
+  isLoading: PropTypes.bool,
+  isCreatedUser: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  formErrors: PropTypes.shape({
+    email: PropTypes.string,
+  }),
 };
 
 UserForm.defaultProps = {
@@ -116,6 +161,11 @@ UserForm.defaultProps = {
     position: '',
     email: '',
   },
+  formErrors: {
+    email: '',
+  },
+  isLoading: false,
+  isCreatedUser: false,
 };
 
 export default UserForm;
